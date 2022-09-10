@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as yup from 'yup';
-import 'yup-phone';
 import styled from "@emotion/styled";
 import { Box } from "../box";
 import {Btn} from "../Button/Button"
@@ -33,7 +32,6 @@ const Input = styled(Field)`
 
 const schema = yup.object().shape({
   name: yup.string().matches("[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$", { message: "Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan" }).required(),
-  // number: yup.string().phone().required(), // пропускає лише Українські номери (+380)
   number: yup.string().required(),
 });
 
