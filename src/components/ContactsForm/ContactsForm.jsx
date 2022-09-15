@@ -1,9 +1,9 @@
-import PropTypes from 'prop-types';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as yup from 'yup';
+import PropTypes from "prop-types";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as yup from "yup";
 import styled from "@emotion/styled";
 import { Box } from "../box";
-import {Btn} from "../Button/Button"
+import { Btn } from "../Button/Button"
 
 const FormStyled = styled(Form)`
   display: flex;

@@ -1,100 +1,68 @@
-import React, { Component } from "react";
-import { GlobalStyles } from "./GlobalStyles";
-import { nanoid } from 'nanoid';
-import { ContactsForm } from 'components/ContactsForm/ContactsForm';
+import { useState } from "react";
+import { useLocalStorage } from "Hooks/UseLocalStorage";
+import { ContactsForm } from "components/ContactsForm/ContactsForm";
 import { Filter } from "components/Filter/Filter";
 import { ContactsList } from "components/ContactsList/ContactsList";
 import { Section, Container, H1, H2, InfoMessage } from "components/App.styled";
+import { nanoid } from "nanoid";
 import { BiInfoCircle } from "react-icons/bi";
+import { GlobalStyles } from "./GlobalStyles";
 
-export class App extends Component {
-  state = {
-  contacts: [],
-  filter: '',
-  }
+export function App() {
+  const [contacts, setContacts] = useLocalStorage("contacts", []);
+  const [filter, setFilter] = useState("");
 
-  componentDidMount() {
-    const savedContacts = localStorage.getItem('contacts');
-    const parsedContacts = JSON.parse(savedContacts);
-
-    if (parsedContacts) {
-      this.setState({
-        contacts: parsedContacts,
-      })
-    }
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    const { contacts } = this.state;
-
-    if (contacts !== prevState.contacts) {
-      localStorage.setItem('contacts', JSON.stringify(contacts))
-    }
-    if (contacts.length === 0) {
-      localStorage.removeItem('contacts');
-    }
-  }
-  
-  createContact(name, number) {
+  const createContact = (name, number) => {
     return { name: name, number: number, id: nanoid() };
-  }
-
-  addContact = contact => {
-    this.setState(prevState => {
-      return { contacts: [contact, ...prevState.contacts] };
-    });
   };
 
-  deleteContact = (contactId) => {
-    this.setState(prevState => ({
-      contacts: prevState.contacts.filter(contact => contact.id !== contactId),
-    }));
+  const addContact = contact => {
+    setContacts([contact, ...contacts]);
   };
 
-  isIncludes = newName => {
-    return this.state.contacts.find(
+  const deleteContact = contactId => {
+    setContacts(prevState => prevState.filter(contact => contact.id !== contactId));
+  };
+
+  const isIncludes = newName => {
+    return contacts.find(
       contact =>
         contact.name.toLocaleLowerCase() === newName.toLocaleLowerCase().trim()
-    );
+    )
   };
 
-  handleFormSubmit = ({ name, number }) => {
-    this.isIncludes(name)
+  const handleFormSubmit = ({ name, number }) => {
+    isIncludes(name)
       ? alert(`${name} is already in contacts`)
-      : this.addContact(this.createContact(name, number));
+      : addContact(createContact(name, number));
   };
 
-  handleFilterChange = filterName => {
-    this.setState(() => {
-      return { filter: filterName };
-    });
+  const handleFilterChange = filterName => {
+    setFilter(filterName);
   };
-  
-  render() {
-    const { contacts, filter } = this.state;
-    return (
-      <div>
-        <Section>
-          <Container>
-            <H1>Phonebook</H1>
-            <ContactsForm handleFormSubmit={this.handleFormSubmit} />
-          </Container>
-        </Section>
-        <Section>
-          <Container>
-            <H2>Contacts</H2>
-            <Filter filter={filter} handleFilterChange={this.handleFilterChange} />
-            {contacts.length > 0
-              ? <ContactsList
-                  contacts={contacts}
-                  filter={filter}
-                  deleteContact={this.deleteContact}
-                />
-              : (<InfoMessage><BiInfoCircle/>There are no contacts yet</InfoMessage>)}
-          </Container>  
-        </Section>
-        <GlobalStyles />
-      </div>
-    );
-  };
+
+  return (
+    <>
+      <Section>
+        <Container>
+          <H1>Phonebook</H1>
+          <ContactsForm handleFormSubmit={handleFormSubmit} />
+        </Container>
+      </Section>
+      <Section>
+        <Container>
+          <H2>Contacts</H2>
+          <Filter filter={filter} handleFilterChange={handleFilterChange} />
+          {contacts.length > 0
+            ? <ContactsList
+                contacts={contacts}
+                filter={filter}
+                deleteContact={deleteContact}
+              />
+            : (<InfoMessage><BiInfoCircle/>There are no contacts yet</InfoMessage>)}
+        </Container>  
+      </Section>
+      <GlobalStyles />
+    </>
+  );
 };
